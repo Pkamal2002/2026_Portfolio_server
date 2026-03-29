@@ -13,8 +13,17 @@ export const authMiddleware = (req, res, next) => {
     }
 
     req.user = verified.id;
+    req.userRole = verified.role;
     next();
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+// Higher-order middleware for role-based access
+export const roleMiddleware = (...roles) => (req, res, next) => {
+  if (!roles.includes(req.userRole)) {
+    return res.status(403).json({ message: 'Access denied: insufficient permissions' });
+  }
+  next();
 };
